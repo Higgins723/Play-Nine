@@ -6,12 +6,9 @@ import './font-awesome-4.7.0/css/font-awesome.css';
 
 
 const Stars = (props) => {
-  // This will give numberOfStars a random number from 1 to 9
-  const numberOfStars = 1 + Math.floor(Math.random() * 9);
-
   return (
     <div className="col-md-5">
-      {range(numberOfStars).map(i =>
+      {range(props.numberOfStars).map(i =>
         <i key={i} className="fa fa-star"></i>
       )}
     </div>
@@ -47,7 +44,10 @@ const Numbers = (props) => {
     <div className="card text-center">
       <div>
         {Numbers.list.map((number, i) =>
-          <span key={i} className={numberClassName(number)}>{number}</span>
+          <span key={i} className={numberClassName(number)}
+                onClick={() => props.selectNumber(number)}>
+            {number}
+          </span>
         )}
       </div>
     </div>
@@ -58,6 +58,15 @@ Numbers.list = range(1, 10);
 class Game extends Component {
   state = {
     selectedNumbers: [],
+    randomNumberOfStars: 1 + Math.floor(Math.random() * 9),
+  };
+  selectNumber = (clickedNumber) => {
+    // return nothing if a number has already been clicked
+    if (this.state.selectedNumbers.indexOf(clickedNumber) >= 0) { return; }
+    // else, add number to selectedNumbers state
+    this.setState(prevState => ({
+      selectedNumbers: prevState.selectedNumbers.concat(clickedNumber)
+    }));
   };
 
   render() {
@@ -66,12 +75,13 @@ class Game extends Component {
         <h3>Play Nine</h3>
         <hr />
         <div className="row">
-          <Stars />
+          <Stars numberOfStars={this.state.randomNumberOfStars}/>
           <Button />
           <Answer selectedNumbers={this.state.selectedNumbers}/>
         </div>
         <br />
-        <Numbers selectedNumbers={this.state.selectedNumbers}/>
+        <Numbers selectedNumbers={this.state.selectedNumbers}
+                 selectNumber={this.selectNumber}/>
       </div>
     );
   }
